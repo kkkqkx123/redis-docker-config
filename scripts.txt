@@ -1,0 +1,33 @@
+# Redis Docker 部署脚本 - WSL环境
+# 在Windows宿主机上执行这些命令，它们会自动在WSL中运行
+
+# 1. 进入WSL中的项目目录
+wsl -e bash -cl "cd /home/docker-compose/redis && pwd"
+
+# 2. 处理脚本乱码问题（如果需要）
+wsl -e bash -cl "cd /home/docker-compose/redis && sed -i 's/\r$//' *.sh"
+
+# 3. 启动Redis服务
+wsl -e bash -cl "cd /home/docker-compose/redis && docker-compose -f docker-compose.redis.yml up -d"
+
+# 4. 等待服务启动（建议等待5秒）
+timeout /t 5 /nobreak
+
+# 5. 检查服务状态
+wsl -e bash -cl "cd /home/docker-compose/redis && docker-compose -f docker-compose.redis.yml ps"
+
+# 6. 验证Redis连接
+wsl -e bash -cl "cd /home/docker-compose/redis && docker-compose -f docker-compose.redis.yml exec redis redis-cli ping"
+
+# 7. 验证Redis Exporter指标
+# 在浏览器访问 http://localhost:9121/metrics 或使用curl
+wsl -e bash -cl "cd /home/docker-compose/redis && curl -s http://localhost:9121/metrics | head -20"
+
+# 8. 查看实时日志
+wsl -e bash -cl "cd /home/docker-compose/redis && docker-compose -f docker-compose.redis.yml logs -f"
+
+# 9. 重启服务
+wsl -e bash -cl "cd /home/docker-compose/redis && docker-compose -f docker-compose.redis.yml down && docker-compose -f docker-compose.redis.yml up -d"
+
+# 10. 停止服务
+wsl -e bash -cl "cd /home/docker-compose/redis && docker-compose -f docker-compose.redis.yml down"
