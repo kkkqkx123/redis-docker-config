@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - redis-network
+    command: redis-server --appendonly yes
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis:6379
+    restart: unless-stopped
+    networks:
+      - redis-network
+    depends_on:
+      - redis
+
+networks:
+  redis-network:
+    driver: bridge
